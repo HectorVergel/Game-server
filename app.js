@@ -33,6 +33,7 @@ app.post('/play-card/:player', (req,res) => {
     res.status(201).send('Card played');
 });
 
+
 app.post('/end-match/:mode/:id', (req, res) => {
     const mode = req.params.mode;
     const id = req.params.id;
@@ -82,6 +83,9 @@ wss.on('connection', function connection(ws) {
                     }
                     gameManager.InitializeLastClient(data);
                 break;
+                case "STEAL":
+                    gameManager.StealCard(parts[2],parts[1]);
+                    break;
             }
            
         }

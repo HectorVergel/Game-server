@@ -18,8 +18,23 @@ function PlayCard(cardData, matchID, clientID)
         
     }
     const currentPlayer = clients.find(client => client.clientID == clientID);
+    currentPlayer.cards--;
     console.log("ID del cliente que ha juegado " + clientID);
     NextTurn(currentPlayer);
+}
+
+function StealCard(matchID, clientID)
+{
+    const matchClients = clients.filter(client => client.matchID == matchID);
+    const myClient = clients.find(client => client.clientID == clientID);
+    console.log(matchID + " " + clientID);
+
+    for (let index = 0; index < matchClients.length; index++) 
+    {
+        matchClients[index].ws.send(myClient.clientID + "_steal");
+            
+    }
+
 }
 
 function AddClient(wsClient)
@@ -37,6 +52,7 @@ function AddClient(wsClient)
         ws: wsClient,
         matchID: "",
         clientID: "",
+        cards: 7,
         order: currentOrder
     }
     clients.push(client);
@@ -86,12 +102,12 @@ function NextTurn(currentClient)
         nextClient = clients.find(client => client.order == 1);
     }
     
-    nextClient.ws.send("send");
+    nextClient.ws.send(currentClient.clientID);
     
 }
 
 
 module.exports = 
 {
-    PlayCard, AddClient, InitializeLastClient
+    PlayCard, AddClient, InitializeLastClient, StealCard
 }
