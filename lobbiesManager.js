@@ -30,7 +30,6 @@ function TryGetMatch(_playerName)
     {
         for(let i = 0; i<gameLobbies.length; i++)
         {
-            console.log("Lobby " + gameLobbies[i].players);
             if(gameLobbies[i].players.find(player => player.name == _playerName))
             {
                 return JSON.stringify(gameLobbies[i]);

@@ -8,10 +8,7 @@ const maxMatchSize = 2;
 function PlayCard(cardData, matchID, clientID)
 {
     const matchClients = clients.filter(client => client.matchID == matchID);
-    console.log(clients.length);
-    console.log("Client1: " + clients[0].matchID);
-    console.log("Client2: " + clients[1].matchID);
-    console.log(cardData);
+
     for (let index = 0; index < matchClients.length; index++) 
     {
        matchClients[index].ws.send(JSON.stringify(cardData));
@@ -19,15 +16,27 @@ function PlayCard(cardData, matchID, clientID)
     }
     const currentPlayer = clients.find(client => client.clientID == clientID);
     currentPlayer.cards--;
-    console.log("ID del cliente que ha juegado " + clientID);
-    NextTurn(currentPlayer);
+    if(cardData.type == 1 || cardData.type == 2)
+    {
+        let order = currentPlayer.order + 1;
+        let nextClient = clients.find(client => client.order == order);
+        if(nextClient == null)
+        {
+            nextClient = clients.find(client => client.order == 1);
+        }
+        nextClient.ws.send("block_"+currentPlayer.clientID);
+    }
+    else
+    {
+
+        NextTurn(currentPlayer);
+    }
 }
 
 function StealCard(matchID, clientID)
 {
     const matchClients = clients.filter(client => client.matchID == matchID);
     const myClient = clients.find(client => client.clientID == clientID);
-    console.log(matchID + " " + clientID);
 
     for (let index = 0; index < matchClients.length; index++) 
     {
@@ -70,24 +79,12 @@ function InitializeLastClient(data)
 }
 
 
-const timeInterval = setInterval(Update, 1000);
-
-function Update() 
-{
-    if(clients.length > 0)
-    {
-
-        //console.log(clients[0]);
-    }
-}
-
 async function StartTurn()
 {
     if(clients.length >= maxMatchSize)
     {
         const firstClient = clients.find(client => client.order == 1);
         firstClient.ws.send("send");
-        console.log("First player turn")
     }
         
 }
@@ -109,5 +106,5 @@ function NextTurn(currentClient)
 
 module.exports = 
 {
-    PlayCard, AddClient, InitializeLastClient, StealCard
+    PlayCard, AddClient, InitializeLastClient, StealCard, NextTurn
 }
